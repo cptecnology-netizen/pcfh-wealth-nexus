@@ -1,0 +1,5 @@
+{
+  "name": "PCFH Nexus",
+  "description": "Plataforma integrada de gestão patrimonial, fiscal e fiduciária para o Primo Couto Family Holdings (SFO). Inclui módulos de automação fiscal, governança familiar e monitorização de riscos.",
+  "requestFramePermissions": []
+}
