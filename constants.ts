@@ -1,4 +1,4 @@
-import { Asset, AssetCategory, FamilyMember, Donation, FamilyProtocol, RiskScenario, Alert, FiscalReserveState } from './types';
+import { Asset, AssetCategory, FamilyMember, Donation, FamilyProtocol, RiskScenario, Alert, FiscalReserveState, PayrollEntry } from './types';
 
 // Exchange Rate Estimate for Jan 2026 Context
 const USD_AOA_RATE = 910; 
@@ -25,6 +25,26 @@ export const MOCK_ASSETS: Asset[] = [
     currency: 'AOA', 
     lastValuationDate: '2025-12-01', 
     roi: 0.08 
+  },
+  { 
+    id: 'prop_2', 
+    name: 'Casa Jardim do Éden (Arrendada)', 
+    category: AssetCategory.REAL_ESTATE, 
+    value: 125000000, 
+    currency: 'AOA', 
+    lastValuationDate: '2026-01-20', 
+    roi: 0.0216 // (225k * 12) / 125M ~= 2.16% Yield Anual
+  },
+
+  // --- VEHICLES ---
+  { 
+    id: 'veh_1', 
+    name: 'Ford Escort', 
+    category: AssetCategory.VEHICLES, 
+    value: 7000000, 
+    currency: 'AOA', 
+    lastValuationDate: '2026-01-20', 
+    roi: -0.10 // Depreciação estimada
   },
 
   // --- OFFSHORE ASSETS (USA) ---
@@ -94,6 +114,31 @@ export const MOCK_ASSETS: Asset[] = [
     currency: 'AOA', 
     lastValuationDate: '2026-01-10', 
     roi: 0.175 
+  }
+];
+
+export const MOCK_PAYROLL: PayrollEntry[] = [
+  {
+    id: 'staff_1',
+    name: 'Margarida Eduardo',
+    role: 'Doméstica',
+    baseSalary: 150000,
+    allowances: 50000, // 25k Alim + 25k Transp
+    socialSecurityWorker: 4500, // 3% de 150k
+    socialSecurityEmployer: 12000, // 8% de 150k
+    irt: 3000, // 2% de 150k
+    netSalary: 192500 // 150k + 50k - 4.5k - 3k
+  },
+  {
+    id: 'staff_2',
+    name: 'Rosalina Eduardo',
+    role: 'Doméstica',
+    baseSalary: 150000,
+    allowances: 50000, // 25k Alim + 25k Transp
+    socialSecurityWorker: 4500, // 3% de 150k
+    socialSecurityEmployer: 12000, // 8% de 150k
+    irt: 3000, // 2% de 150k
+    netSalary: 192500 // 150k + 50k - 4.5k - 3k
   }
 ];
 

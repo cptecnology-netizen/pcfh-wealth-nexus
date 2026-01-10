@@ -6,7 +6,8 @@ export enum AssetCategory {
   PRIVATE_EQUITY = 'Private Equity',
   ART = 'Arte & Colecionáveis',
   CRYPTO = 'Criptoativos',
-  CASH = 'Liquidez & Depósitos'
+  CASH = 'Liquidez & Depósitos',
+  VEHICLES = 'Veículos & Transportes'
 }
 
 export enum RiskLevel {
@@ -85,4 +86,16 @@ export interface FiscalReserveState {
   currentBalance: number;
   estimatedObligation: number; // Based on pending taxes
   nextPaymentDate: string;
+}
+
+export interface PayrollEntry {
+  id: string;
+  name: string;
+  role: string;
+  baseSalary: number;
+  allowances: number; // Food + Transport
+  socialSecurityWorker: number; // 3%
+  socialSecurityEmployer: number; // 8%
+  irt: number; // 2%
+  netSalary: number;
 }

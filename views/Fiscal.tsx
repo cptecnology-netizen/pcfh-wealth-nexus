@@ -5,13 +5,17 @@ import {
   Landmark, 
   FileCheck,
   Download,
-  CheckCircle2
+  CheckCircle2,
+  Users,
+  Briefcase,
+  Receipt
 } from 'lucide-react';
-import { CURRENCY_FORMATTER, PERCENT_FORMATTER, INITIAL_RESERVE_STATE } from '../constants';
+import { CURRENCY_FORMATTER, PERCENT_FORMATTER, INITIAL_RESERVE_STATE, MOCK_PAYROLL } from '../constants';
 
 export const FiscalView: React.FC = () => {
   const [valiaInput, setValiaInput] = useState<number>(0);
   const [showSimulation, setShowSimulation] = useState(false);
+  const [selectedPaySlip, setSelectedPaySlip] = useState<string | null>('staff_1'); // Default to Margarida
 
   // Logic: 10% Tax + 5% Margin = 10.5% Total
   const taxBase = valiaInput * 0.10;
@@ -24,11 +28,15 @@ export const FiscalView: React.FC = () => {
     setShowSimulation(true);
   };
 
+  const totalPayrollCost = MOCK_PAYROLL.reduce((acc, emp) => acc + emp.baseSalary + emp.allowances + emp.socialSecurityEmployer, 0);
+
+  const selectedEmployee = MOCK_PAYROLL.find(e => e.id === selectedPaySlip);
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Gestão Fiscal & Conta Reserva</h1>
-        <p className="text-slate-500 text-sm mt-1">Conformidade com AGT, cálculo de mais-valias e automação de reservas (Lei 26/20).</p>
+        <p className="text-slate-500 text-sm mt-1">Conformidade com AGT, cálculo de mais-valias, automação de reservas e payroll.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -36,6 +44,123 @@ export const FiscalView: React.FC = () => {
         {/* Left Column: Simulation & Action */}
         <div className="lg:col-span-2 space-y-6">
           
+          {/* Payroll Management */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+              <h3 className="font-bold text-slate-900 flex items-center gap-2">
+                <Users size={18} className="text-slate-600" />
+                Gestão de Payroll & Despesas
+              </h3>
+              <span className="text-xs font-semibold text-slate-600">Custo Mensal Total: {CURRENCY_FORMATTER.format(totalPayrollCost)}</span>
+            </div>
+            
+            <div className="p-6">
+              <div className="overflow-x-auto mb-6">
+                <table className="w-full text-sm text-left">
+                  <thead className="text-xs text-slate-500 uppercase bg-slate-50">
+                    <tr>
+                      <th className="px-3 py-2">Colaborador</th>
+                      <th className="px-3 py-2">Base + Subs.</th>
+                      <th className="px-3 py-2">SS (3%)</th>
+                      <th className="px-3 py-2">IRT (2%)</th>
+                      <th className="px-3 py-2">Líquido</th>
+                      <th className="px-3 py-2 text-slate-400">Empregador (8%)</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {MOCK_PAYROLL.map(emp => (
+                      <tr 
+                        key={emp.id} 
+                        className={`hover:bg-slate-50 cursor-pointer transition ${selectedPaySlip === emp.id ? 'bg-blue-50/50' : ''}`}
+                        onClick={() => setSelectedPaySlip(emp.id)}
+                      >
+                        <td className="px-3 py-3 font-medium">
+                          {emp.name}
+                          <span className="block text-xs text-slate-400 font-normal">{emp.role}</span>
+                        </td>
+                        <td className="px-3 py-3">
+                          {CURRENCY_FORMATTER.format(emp.baseSalary)}
+                          <span className="block text-xs text-slate-400">+{CURRENCY_FORMATTER.format(emp.allowances)}</span>
+                        </td>
+                        <td className="px-3 py-3 text-red-600">-{CURRENCY_FORMATTER.format(emp.socialSecurityWorker)}</td>
+                        <td className="px-3 py-3 text-red-600">-{CURRENCY_FORMATTER.format(emp.irt)}</td>
+                        <td className="px-3 py-3 font-bold text-emerald-600">{CURRENCY_FORMATTER.format(emp.netSalary)}</td>
+                        <td className="px-3 py-3 text-slate-500">{CURRENCY_FORMATTER.format(emp.socialSecurityEmployer)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Detailed Payslip View */}
+              {selectedEmployee && (
+                <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 animate-in fade-in duration-300">
+                  <div className="flex items-center gap-2 mb-4 border-b border-slate-200 pb-2">
+                    <Receipt size={16} className="text-pcfh-gold" />
+                    <h4 className="font-bold text-slate-800 text-sm">Recibo Detalhado: {selectedEmployee.name}</h4>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                    {/* Earnings */}
+                    <div>
+                      <h5 className="text-xs font-semibold text-slate-500 uppercase mb-3">Rendimentos</h5>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Salário Base</span>
+                          <span className="font-medium">{CURRENCY_FORMATTER.format(selectedEmployee.baseSalary)}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-600">
+                          <span>Subs. Alimentação</span>
+                          <span>{CURRENCY_FORMATTER.format(25000)}</span>
+                        </div>
+                        <div className="flex justify-between text-slate-600">
+                          <span>Subs. Transporte</span>
+                          <span>{CURRENCY_FORMATTER.format(25000)}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-slate-200 pt-2 font-bold text-slate-900">
+                          <span>Total Ilíquido</span>
+                          <span>{CURRENCY_FORMATTER.format(selectedEmployee.baseSalary + selectedEmployee.allowances)}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Deductions */}
+                    <div>
+                      <h5 className="text-xs font-semibold text-slate-500 uppercase mb-3">Descontos</h5>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-red-600">
+                          <span>Seg. Social (3%)</span>
+                          <span>-{CURRENCY_FORMATTER.format(selectedEmployee.socialSecurityWorker)}</span>
+                        </div>
+                         <div className="flex justify-between text-xs text-slate-400 pl-2">
+                          <span>Base de Incidência</span>
+                          <span>{CURRENCY_FORMATTER.format(selectedEmployee.baseSalary)}</span>
+                        </div>
+                        <div className="flex justify-between text-red-600 mt-2">
+                          <span>IRT (2%)</span>
+                          <span>-{CURRENCY_FORMATTER.format(selectedEmployee.irt)}</span>
+                        </div>
+                        <div className="flex justify-between border-t border-slate-200 pt-2 font-bold text-emerald-600 text-lg">
+                          <span>Líquido a Receber</span>
+                          <span>{CURRENCY_FORMATTER.format(selectedEmployee.netSalary)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="mt-4 flex gap-3 justify-end">
+                <button className="text-sm bg-white border border-slate-300 px-3 py-2 rounded hover:bg-slate-50 flex items-center gap-2">
+                  <Download size={14} /> Baixar PDF
+                </button>
+                <button className="text-sm bg-pcfh-800 text-white px-3 py-2 rounded hover:bg-pcfh-700 flex items-center gap-2">
+                  <Briefcase size={14} /> Confirmar Processamento
+                </button>
+              </div>
+            </div>
+          </div>
+
           {/* Automation Card */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div className="bg-pcfh-900 px-6 py-4 flex justify-between items-center">
@@ -104,38 +229,6 @@ export const FiscalView: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
-
-          {/* Recent Tax Events */}
-          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-             <h3 className="font-bold text-slate-900 mb-4">Histórico Recente de Impostos</h3>
-             <table className="w-full text-sm text-left">
-                <thead className="text-xs text-slate-500 uppercase bg-slate-50">
-                  <tr>
-                    <th className="px-4 py-3">Data</th>
-                    <th className="px-4 py-3">Evento</th>
-                    <th className="px-4 py-3">Base Tributável</th>
-                    <th className="px-4 py-3">IRT Pago</th>
-                    <th className="px-4 py-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  <tr>
-                    <td className="px-4 py-3">15/01/2025</td>
-                    <td className="px-4 py-3 font-medium">Venda Ações Unitel</td>
-                    <td className="px-4 py-3">AOA 50.000.000</td>
-                    <td className="px-4 py-3">AOA 5.000.000</td>
-                    <td className="px-4 py-3"><span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Pago</span></td>
-                  </tr>
-                  <tr>
-                    <td className="px-4 py-3">10/12/2024</td>
-                    <td className="px-4 py-3 font-medium">Dividendo BAI</td>
-                    <td className="px-4 py-3">AOA 12.000.000</td>
-                    <td className="px-4 py-3">AOA 1.200.000</td>
-                    <td className="px-4 py-3"><span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs">Pago</span></td>
-                  </tr>
-                </tbody>
-             </table>
           </div>
         </div>
 
